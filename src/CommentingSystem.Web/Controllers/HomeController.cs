@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using PaulMiami.AspNetCore.Mvc.Recaptcha;
 using System.Linq;
+using X.PagedList;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace CommentingSystem.Controllers;
@@ -20,9 +21,13 @@ public class HomeController : Controller
 		_db = db;
 	}
 
-	public async Task<IActionResult> Index()
+	public async Task<IActionResult> Index(int? page = 1)
 	{
-
+		if (page != null && page < 1)
+		{
+			page = 1;
+		}
+		var pageSize = 2;
 		List<Comment> comments = await _db.Comments
 			.AsNoTrackingWithIdentityResolution()
 			.Include(c => c.Children)
@@ -30,41 +35,14 @@ public class HomeController : Controller
 			.ToListAsync();
 
 		// Structure comments into a tree
-		List<Comment> rootComments = comments
+		var rootComments = comments
 			.Where(c => c.ParentId == null)
 			.AsParallel()
 			.OrderByDescending(x => x.DateCreated)
-			.ToList();
+			.ToPagedList(page ?? 1, pageSize);
 
 		return View(rootComments);
 	}
-
-	//[HttpPost]
-	//public async Task<IActionResult> Registration(CreateCommentDto commentCDto)
-	//{
-	//	if (ModelState.IsValid)
-	//	{
-	//		var newComment = new Comment
-	//		{
-	//			ParentId = commentCDto.ReplyToCommentId,
-	//			FullName = commentCDto.FullName,
-	//			Email = commentCDto.Email,
-	//			Message = commentCDto.Message,
-	//			Picture = commentCDto.Picture.FileDownloadName,
-	//			HomePage = commentCDto.HomePage,
-	//			DateCreated = DateTimeOffset.Now,
-	//			DateModified = DateTimeOffset.Now
-	//		};
-
-	//		await _db.Comments.AddAsync(newComment);
-	//		await _db.SaveChangesAsync();
-	//		return RedirectToAction(nameof(Index));
-	//	}
-
-	//	// TODO: Throw some error
-	//	return RedirectToAction(nameof(Index));
-	//}
-
 
 	[HttpPost]
 	public async Task<IActionResult> CreateComment(CreateCommentDto commentCDto)

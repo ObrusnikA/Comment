@@ -1,4 +1,7 @@
-﻿@model IEnumerable<Comment>
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model IPagedList<Comment>
 
 @{
     ViewData["Title"] = "Comments";
@@ -19,13 +22,30 @@
         <div class="col-12 mt-2">
             <div class="border border-primary rounded p-2">
                 <partial name="_CommentsPartialView" model="Model" />
-            </div>
+				<nav>
+					@Html.PagedListPager(Model, page => Url.Action("index", new { page = page }), new PagedListRenderOptions()
+				{
+				ActiveLiElementClass = "active",
+				PageClasses = new[]{ "page-link"},
+				LiElementClasses=new[] { "page-item" },
+				UlElementClasses = new[] { "pagination","justify-content-center", "mt-3" },
+				LinkToNextPageFormat = "Next",
+				LinkToPreviousPageFormat = "Previous",
+				MaximumPageNumbersToDisplay = 5,
+				DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+				DisplayLinkToNextPage = PagedListDisplayMode.Always
+				})
+				</nav>
+			</div>
         </div>
     }
 </div>
 
+
+
 <partial name="_CreateReplyModal" model="default" />
 <partial name="_DeleteCommentModal" />
+
 
 @section scripts {
     <script>
@@ -38,6 +58,7 @@
         });
 
 
+
         var deleteModal = document.getElementById('deleteModal');
         // Send selected comment data to the delete modal.
         deleteModal.addEventListener('show.bs.modal', function(event) {
@@ -46,5 +67,4 @@
             deleteModal.querySelector('.modal-body #CommentId').value = commentId;
         });
     </script>
-
 }

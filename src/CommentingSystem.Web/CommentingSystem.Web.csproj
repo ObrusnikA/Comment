@@ -17,6 +17,7 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.9" />
 		<PackageReference Include="PaulMiami.AspNetCore.Mvc.Recaptcha" Version="1.2.2" />
+		<PackageReference Include="X.PagedList.Mvc.Core" Version="8.4.3" />
 	</ItemGroup>
 
 </Project>
