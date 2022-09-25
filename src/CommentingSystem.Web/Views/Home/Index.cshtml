@@ -17,6 +17,11 @@
         </div>
     </div>
 
+	<div class="btn-group" role="group" aria-label="Basic outlined example">
+		@Html.ActionLink("User name", "Index", new { sortOrder = ViewBag.NameSortParm },new { @class = "btn btn-outline-primary"})
+		@Html.ActionLink("E-mail", "Index", new { sortOrder = ViewBag.EmailSortParm },new { @class = "btn btn-outline-primary"})
+		@Html.ActionLink("Date", "Index", new { sortOrder = ViewBag.DateSortParm },new { @class = "btn btn-outline-primary"})
+	</div>
     @if (Model.Any())
     {
         <div class="col-12 mt-2">

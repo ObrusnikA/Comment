@@ -13,4 +13,6 @@ public class Comment
 	public DateTimeOffset DateModified { get; set; }
 	public Comment Parent { get; set; }
 	public ICollection<Comment> Children { get; set; }
+	public string IpAddress { get; init; }
+	public string WebBrowser { get; init; }
 }

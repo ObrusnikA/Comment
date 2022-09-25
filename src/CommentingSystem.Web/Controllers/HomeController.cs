@@ -2,6 +2,7 @@
 using CommentingSystem.Domain;
 using CommentingSystem.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using PaulMiami.AspNetCore.Mvc.Recaptcha;
@@ -21,25 +22,53 @@ public class HomeController : Controller
 		_db = db;
 	}
 
-	public async Task<IActionResult> Index(int? page = 1)
+	public async Task<IActionResult> Index(int? page = 1, string sortOrder = "")
 	{
 		if (page != null && page < 1)
 		{
 			page = 1;
 		}
-		var pageSize = 2;
+
+		var pageSize = 25;
 		List<Comment> comments = await _db.Comments
 			.AsNoTrackingWithIdentityResolution()
 			.Include(c => c.Children)
-			.OrderByDescending(x => x.DateCreated)
 			.ToListAsync();
 
 		// Structure comments into a tree
-		var rootComments = comments
+		var rootCommentsQuery = comments
 			.Where(c => c.ParentId == null)
-			.AsParallel()
-			.OrderByDescending(x => x.DateCreated)
-			.ToPagedList(page ?? 1, pageSize);
+			.AsParallel();
+
+		ViewBag.NameSortParm = sortOrder == "name" ? "name_desc" : "name";
+		ViewBag.DateSortParm = sortOrder == "date" ? "date_desc" : "date";
+		ViewBag.EmailSortParm = sortOrder == "email" ? "email_desc" : "email";
+		switch (sortOrder)
+		{
+			case "email":
+				rootCommentsQuery = rootCommentsQuery.OrderBy(s => s.Email);
+				break;
+			case "email_desc":
+				rootCommentsQuery = rootCommentsQuery.OrderByDescending(s => s.Email);
+				break;
+			case "name":
+				rootCommentsQuery = rootCommentsQuery.OrderBy(s => s.FullName);
+				break;
+			case "name_desc":
+				rootCommentsQuery = rootCommentsQuery.OrderByDescending(s => s.FullName);
+				break;
+			case "date":
+				rootCommentsQuery = rootCommentsQuery.OrderBy(s => s.DateCreated);
+				break;
+			case "date_desc":
+				rootCommentsQuery = rootCommentsQuery.OrderByDescending(s => s.DateCreated);
+				break;
+			default:
+				rootCommentsQuery = rootCommentsQuery.OrderByDescending(s => s.DateCreated);
+				break;
+		}
+
+		var rootComments = rootCommentsQuery.ToPagedList(page ?? 1, pageSize);
 
 		return View(rootComments);
 	}
@@ -47,6 +76,7 @@ public class HomeController : Controller
 	[HttpPost]
 	public async Task<IActionResult> CreateComment(CreateCommentDto commentCDto)
 	{
+
 		if (ModelState.IsValid)
 		{
 			var newComment = new Comment
@@ -57,7 +87,9 @@ public class HomeController : Controller
 				Message = commentCDto.Message,
 				HomePage = commentCDto.HomePage,
 				DateCreated = DateTimeOffset.Now,
-				DateModified = DateTimeOffset.Now
+				DateModified = DateTimeOffset.Now,
+				IpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString(),
+				WebBrowser = Request.Headers["User-Agent"].ToString()
 			};
 			using (var ms = new MemoryStream())
 			{
