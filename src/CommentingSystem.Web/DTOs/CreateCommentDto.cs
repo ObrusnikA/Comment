@@ -21,5 +21,6 @@ public record class CreateCommentDto
 
 	[Url]
 	public string HomePage { get; init; }
+	public IFormFile dowloadedFile { get; set; }
 }
 

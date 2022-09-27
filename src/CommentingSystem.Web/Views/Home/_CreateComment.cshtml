@@ -1,12 +1,11 @@
 ﻿@model CreateCommentDto
 
-
 <form method="post" asp-action="CreateComment" asp-controller="Home" enctype="multipart/form-data">
 
 	<div class="row mb-2">
 
 		<div class="form-group col">
-			<input type="file" class="form-control" asp-for="Image"/>
+			<input type="file" class="form-control" accept=".jpg, .gif, .png" asp-for="Image" />
 			<span asp-validation-for="Image" class="text-danger"></span>
 		</div>
 
@@ -27,15 +26,21 @@
         </div>
     </div>
 
-    <div class="row mb-2">
-        <div class="col">
-            <div class="form-floating">
-                <textarea asp-for="Message" class="form-control" placeholder="Leave a comment here"></textarea>
-                <label asp-for="Message"></label>
-                <span asp-validation-for="Message" class="text-danger"></span>
-            </div>
-        </div>
-    </div>
+	<div class="card border-primary">
+		<div class="row mb-2">
+			<div class="col">
+				<div class="form-floating">
+					<textarea asp-for="Message" class="form-control" placeholder="Leave a comment here"></textarea>
+					<label asp-for="Message"></label>
+					<span asp-validation-for="Message" class="text-danger"></span>
+				</div>
+			</div>
+		</div>
+		<input type="file" id="file" class="form-control" accept=".txt" asp-for="dowloadedFile" style="width:20%" />
+	</div>
+
+    
+
 
 	<div class="row mb-2">
 		<div class="col">
@@ -56,3 +61,16 @@
     </div>
 </form>
 
+@section scripts
+{
+	<script>
+		var uploadField = document.getElementById("file");
+
+		function myFunction() {
+			if (this.files[0].size > 100000) {
+				alert("File is too big!");
+				this.value = "";
+			};
+		}
+	</script>
+}

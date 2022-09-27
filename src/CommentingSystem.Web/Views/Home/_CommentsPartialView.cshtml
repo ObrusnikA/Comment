@@ -10,6 +10,14 @@
                     <h5 class="card-title">@comment.FullName</h5>
                     <h6 class="card-subtitle mb-2 text-muted">@comment.DateCreated.DateTime</h6>
                     <p class="card-text">@comment.Message</p>
+						@if (!string.IsNullOrEmpty(comment.FilePath))
+						{
+							<div class="card border-primary">
+								<div>File: @comment.FileName</div>
+								@*<a asp-action="DownloadFile" asp-route-filePath="@comment.FilePath"> Download file</a>*@
+							@Html.ActionLink("Download","DownloadFile", new {filePath = comment.FilePath, fileName = comment.FileName})
+							</div>
+						}
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#replyModal" data-comment-id="@comment.CommentId">Reply</button>
                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-comment-id="@comment.CommentId">Delete</button>
                 </div>

@@ -1,4 +1,6 @@
-﻿namespace CommentingSystem.Domain;
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace CommentingSystem.Domain;
 
 public class Comment
 {
@@ -13,6 +15,8 @@ public class Comment
 	public DateTimeOffset DateModified { get; set; }
 	public Comment Parent { get; set; }
 	public ICollection<Comment> Children { get; set; }
-	public string IpAddress { get; init; }
-	public string WebBrowser { get; init; }
+	public string IpAddress { get; set; }
+	public string WebBrowser { get; set; }
+	public string FilePath { get; set; }
+	public string FileName { get; set; }
 }
